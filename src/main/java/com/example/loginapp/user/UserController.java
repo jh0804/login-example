@@ -61,15 +61,7 @@ public class UserController {
     public String login(UserRequest.LoginDTO loginDTO, HttpServletResponse response) {
         User sessionUser = userService.login(loginDTO);
         session.setAttribute("sessionUser", sessionUser);
-        if (loginDTO.getRememberMe() == null) {
-            Cookie cookie = new Cookie("username", null);
-            cookie.setMaxAge(0);
-            response.addCookie(cookie);
-        } else {
-            Cookie cookie = new Cookie("username", loginDTO.getUsername());
-            cookie.setMaxAge(7 * 24 * 60 * 60);
-            response.addCookie(cookie);
-        }
+
         return "redirect:/";
     }
 
