@@ -70,7 +70,6 @@ public class UserController {
             cookie.setMaxAge(7 * 24 * 60 * 60);
             response.addCookie(cookie);
         }
-
         return "redirect:/";
     }
 
