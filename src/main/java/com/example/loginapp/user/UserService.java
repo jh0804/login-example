@@ -58,7 +58,11 @@ public class UserService {
     public User 회원정보수정(UserRequest.UpdateDTO updateDTO, Integer id) {
         User user = userRepository.findById(id);
         if (user == null) throw new Exception404("회원을 찾을 수 없습니다.");
-        user.update(updateDTO.getPassword(), updateDTO.getEmail());
+
+        String encPassword = BCrypt.hashpw(updateDTO.getPassword(), BCrypt.gensalt());
+
+        user.update(encPassword, updateDTO.getEmail());
+
         return user;
     }
 }
