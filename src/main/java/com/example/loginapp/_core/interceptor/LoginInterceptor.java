@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+
 public class LoginInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -18,7 +19,9 @@ public class LoginInterceptor implements HandlerInterceptor {
         User sessionUser = (User) session.getAttribute("sessionUser");
 
         if (sessionUser == null) {
-            if (uri.contains("/api")) {
+            if(uri.equals("/")){
+                throw new Exception401("인증이 필요합니다");
+            } else if (uri.contains("/api")) {
                 throw new ExceptionApi401("인증이 필요합니다.");
                 // 만약에 직접 처리해야한다면 (filter로 해야하면)
 //                response.setStatus(401);

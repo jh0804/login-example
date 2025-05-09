@@ -1,5 +1,6 @@
 package com.example.loginapp.user;
 
+import org.mindrot.jbcrypt.BCrypt;
 import com.example.loginapp._core.error.ex.Exception400;
 import com.example.loginapp._core.error.ex.Exception401;
 import com.example.loginapp._core.error.ex.Exception404;
@@ -19,6 +20,9 @@ public class UserService {
     @Transactional
     public void join(UserRequest.JoinDTO joinDTO) {
         try {
+            String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+            joinDTO.setPassword(encPassword);
+
             userRepository.save(joinDTO.toEntity());
         } catch (Exception e) {
             throw new Exception400("이미 존재하는 아이디로 회원가입 하지 마세요. postman도 쓰지 마세요.");
@@ -31,8 +35,9 @@ public class UserService {
         // 2. username 불일치 -> Exception
         if (user == null) throw new Exception401("username 혹은 password가 틀렸습니다.");
         // 3. password 불일치 -> Exception
-        if (!(user.getPassword().equals(loginDTO.getPassword())))
-            throw new Exception401("username 혹은 password가 틀렸습니다.");
+        Boolean isSame = BCrypt.checkpw(loginDTO.getPassword(), user.getPassword());
+
+        if (!isSame) throw new Exception401("유저네임 혹은 비밀번호가 틀렸습니다");
         // 4. username & password 전부 일치
         return user;
     }
