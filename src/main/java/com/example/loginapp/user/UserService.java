@@ -1,5 +1,6 @@
 package com.example.loginapp.user;
 
+import com.example.loginapp._core.util.SHA256Util;
 import org.mindrot.jbcrypt.BCrypt;
 import com.example.loginapp._core.error.ex.Exception400;
 import com.example.loginapp._core.error.ex.Exception401;
@@ -20,7 +21,7 @@ public class UserService {
     @Transactional
     public void join(UserRequest.JoinDTO joinDTO) {
         try {
-            String encPassword = BCrypt.hashpw(joinDTO.getPassword(), BCrypt.gensalt());
+            String encPassword = SHA256Util.encrypt(joinDTO.getPassword());
             joinDTO.setPassword(encPassword);
 
             userRepository.save(joinDTO.toEntity());
@@ -35,9 +36,10 @@ public class UserService {
         // 2. username 불일치 -> Exception
         if (user == null) throw new Exception401("username 혹은 password가 틀렸습니다.");
         // 3. password 불일치 -> Exception
-        Boolean isSame = BCrypt.checkpw(loginDTO.getPassword(), user.getPassword());
-
-        if (!isSame) throw new Exception401("유저네임 혹은 비밀번호가 틀렸습니다");
+        String encPassword = SHA256Util.encrypt(loginDTO.getPassword());
+        if (!encPassword.equals(user.getPassword())) {
+            throw new Exception401("username 혹은 password가 틀렸습니다.");
+        }
         // 4. username & password 전부 일치
         return user;
     }
